@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Task
+from .forms import TaskForm
 
 
 def index(request):
@@ -10,6 +11,20 @@ def about(request):
     return render(request, 'main/about.html')
     
 def create(request):
-    return render(request, 'main/create.html')
+    error = ''
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid(): 
+            form.save()
+            return redirect('index')
+        else:
+            error = 'Форма была не валидна'
+        
+    form = TaskForm()
+    context = {
+        'form': form,
+        'error': error,
+    }
+    return render(request, 'main/create.html', context)
 
 
