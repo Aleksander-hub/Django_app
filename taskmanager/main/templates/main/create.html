@@ -1,0 +1,13 @@
+{% extends "main/base.html" %}
+
+{% block title %}Сделать запись{% endblock %}
+
+{% block content %}
+    <h1>Сделать запись</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Введите название" class="form-control"><br>
+        <textarea name="description" placeholder="Введите описание" class="form-control"></textarea><br>
+        <button type="submit" class="btn btn-success">Добавить</button>
+    </form>
+{% endblock  %}
