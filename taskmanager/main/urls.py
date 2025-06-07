@@ -15,5 +15,9 @@ urlpatterns = [
     path('register/', views.RegisterUser.as_view(), name='register'),
     path('login/', views.LoginUser.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(next_page='index'), name='logout'),
+    path('cabinet/', views.cabinet, name='cabinet'),
+    path('advertisements/add/', views.add_advertisement, name='add_advertisement'),
+    path('advertisements/edit/<int:pk>/', views.edit_advertisement, name='edit_advertisement'),
+    path('advertisements/delete/<int:pk>/', views.delete_advertisement, name='delete_advertisement'),
 ]
 

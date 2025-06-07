@@ -1,4 +1,4 @@
-from .models import Task
+from .models import Task, Advertisement
 from django.forms import ModelForm, TextInput, Textarea
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
@@ -72,5 +72,22 @@ class LoginUserForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ('username', 'password')
+
+
+class AdvertisementForm(ModelForm):
+    class Meta:
+        model = Advertisement
+        fields = ['title', 'description', 'photo']
+        widgets = {
+            "title": TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введите заголовок'
+            }),
+            "description": Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Введите описание (до 100 символов)',
+                'maxlength': '100'
+            }),
+        }
 
 

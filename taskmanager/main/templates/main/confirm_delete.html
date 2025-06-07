@@ -1,0 +1,30 @@
+{% extends "main/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">{{ title }}</h2>
+                <p class="text-center lead">Вы уверены, что хотите удалить объявление "<strong>{{ advertisement.title }}</strong>"?</p>
+                <div class="text-center mb-4">
+                    {% if advertisement.photo %}
+                        <img src="{{ advertisement.photo.url }}" class="img-thumbnail" alt="{{ advertisement.title }}" style="max-width: 200px; max-height: 200px;">
+                    {% endif %}
+                    <p class="card-text text-muted small mt-2">Описание: {{ advertisement.description }}</p>
+                </div>
+                
+                <form method="post" action="{% url 'delete_advertisement' advertisement.pk %}">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">Да, удалить</button>
+                        <a href="{% url 'cabinet' %}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

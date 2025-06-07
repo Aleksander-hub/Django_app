@@ -4,15 +4,27 @@
 
 {% block content %}
     <h1>Главная страница</h1>
-    {% if tasks %}
-        {% for el in tasks %}
-            <div class="alert alert-warning mt-4">
-                <h3>{{ el.title }}</h3>
-                <p>{{ el.task }}</p>
+    {% if advertisements %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for ad in advertisements %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    {% if ad.photo %}
+                        <img src="{{ ad.photo.url }}" class="card-img-top" alt="{{ ad.title }}" style="max-height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ ad.title }}</h5>
+                        <p class="card-text text-muted small">{{ ad.created_at|date:"d M Y H:i" }}</p>
+                        <p class="card-text">{{ ad.description }}</p>
+                    </div>
+                </div>
             </div>
         {% endfor %}
+        </div>
     {% else %}
-        <p>Нет записей</p>
+        <div class="alert alert-info text-center" role="alert">
+            Нет объявлений для отображения.
+        </div>
     {% endif %}
-{% endblock  %}
+{% endblock %}
 

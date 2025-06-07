@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
-from .models import Task
-from .forms import TaskForm, RegisterUserForm, LoginUserForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Task, Advertisement
+from .forms import TaskForm, RegisterUserForm, LoginUserForm, AdvertisementForm
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib.auth.views import LoginView
@@ -10,8 +10,8 @@ from .utils import DataMixin
 
 
 def index(request):
-    tasks = Task.objects.order_by('-id')
-    return render(request, 'main/index.html', {'title': 'Главная страница сайта', 'tasks': tasks})
+    advertisements = Advertisement.objects.order_by('-created_at')
+    return render(request, 'main/index.html', {'title': 'Главная страница сайта', 'advertisements': advertisements})
 
 
 def about(request):
@@ -65,5 +65,76 @@ class LoginUser(DataMixin, LoginView):
     def get_success_url(self):
         messages.success(self.request, 'Вы успешно вошли в систему!')
         return reverse_lazy('index')
+    
+
+@login_required(login_url='login')
+def cabinet(request):
+    user_advertisements = Advertisement.objects.filter(user=request.user)
+    context = {
+        'title': 'Личный кабинет',
+        'advertisements': user_advertisements,
+    }
+    return render(request, 'main/cabinet.html', context)
+
+
+@login_required(login_url='login')
+def add_advertisement(request):
+    if request.user.advertisement_set.count() >= 3:
+        messages.error(request, 'Вы достигли лимита в 3 объявления. Удалите старое объявление, чтобы добавить новое.')
+        return redirect('cabinet')
+
+    if request.method == 'POST':
+        form = AdvertisementForm(request.POST, request.FILES)
+        if form.is_valid():
+            advertisement = form.save(commit=False)
+            advertisement.user = request.user
+            advertisement.save()
+            messages.success(request, 'Объявление успешно добавлено!')
+            return redirect('cabinet')
+        else:
+            messages.error(request, 'Форма была не валидна.')
+    else:
+        form = AdvertisementForm()
+
+    context = {
+        'title': 'Добавить объявление',
+        'form': form,
+    }
+    return render(request, 'main/add_advertisement.html', context)
+
+
+@login_required(login_url='login')
+def edit_advertisement(request, pk):
+    advertisement = get_object_or_404(Advertisement, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = AdvertisementForm(request.POST, request.FILES, instance=advertisement)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Объявление успешно обновлено!')
+            return redirect('cabinet')
+        else:
+            messages.error(request, 'Форма была не валидна.')
+    else:
+        form = AdvertisementForm(instance=advertisement)
+
+    context = {
+        'title': 'Редактировать объявление',
+        'form': form,
+    }
+    return render(request, 'main/edit_advertisement.html', context)
+
+
+@login_required(login_url='login')
+def delete_advertisement(request, pk):
+    advertisement = get_object_or_404(Advertisement, pk=pk, user=request.user)
+    if request.method == 'POST':
+        advertisement.delete()
+        messages.success(request, 'Объявление успешно удалено!')
+        return redirect('cabinet')
+    context = {
+        'title': 'Удалить объявление',
+        'advertisement': advertisement,
+    }
+    return render(request, 'main/confirm_delete.html', context)
     
     
